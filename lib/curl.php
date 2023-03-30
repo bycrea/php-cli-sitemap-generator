@@ -1,8 +1,7 @@
 <?php
 
-    function crawlUrl(string $url): stdClass
+    function crawlUrl(string $url, bool $ssl): stdClass
     {
-        global $ssl;
         $fetch = ($ssl ? 'https://' : 'http://') . $url;
         echo "fetching: $fetch\n";
 

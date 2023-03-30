@@ -19,7 +19,7 @@
         ];
 
         // NOTE check langHref
-        $response = crawlUrl($website.$startWith);
+        $response = crawlUrl($website.$startWith, $ssl);
         if ($response->error !== false) {
             $error_logs[] = sprintf("%s%s : %s", $website, $website.$startWith, $response->error);
         } else {
@@ -41,7 +41,7 @@
 
 
         // NOTE Get robots.txt
-        $response = crawlUrl($website . "/robots.txt");
+        $response = crawlUrl($website . "/robots.txt", $ssl);
         if ($response->error !== false) {
             $error_logs[] = "robots.txt not found";
         } else {
@@ -56,7 +56,7 @@
             if(in_array($uri, $uri_to_bind) || in_array($uri."*", $uri_to_bind))
                 continue;
 
-            $response = crawlUrl($website.$uri);
+            $response = crawlUrl($website.$uri, $ssl);
             if ($response->error !== false) {
                 $error_logs[] = sprintf("%s%s : %s", $website, $uri, $response->error);
             } else {
