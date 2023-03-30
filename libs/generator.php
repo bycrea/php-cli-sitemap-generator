@@ -28,8 +28,14 @@
             $html = str_get_html($response->content);
 
             foreach ($html->find('link') as $link) {
-                if ($link->rel === 'alternate' && $link->hreflang !== "x-default")
-                    $hrefLang[] = "/$link->hreflang/";
+                if ($link->rel === 'alternate' && $link->hreflang !== "x-default") {
+                    $lang = $link->hreflang;
+
+                    if(stripos($lang, "-") === 2) $lang = substr($lang, 0, 2);
+                    elseif (stripos($lang, "-") !== false) continue;
+
+                    $hrefLang[] = "/".str_replace("/", "", $lang)."/";
+                }
             }
 
             $hrefLang = array_unique($hrefLang);
@@ -50,6 +56,7 @@
             preg_match_all("/Disallow:(.+)/", $response->content, $matches, );
             if (isset($matches[1])) foreach ($matches[1] as $match) $uri_to_bind[] = preg_replace(["/\n/", "/\"/", "/\s+/"], "", $match);
         }
+
 
         // NOTE start crawling
         $i = 0;
