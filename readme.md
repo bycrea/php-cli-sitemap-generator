@@ -35,7 +35,7 @@ Generate command need's a JSON domain.com config file stored in /configs
 Use /configs/domain.com.json as a template
 
 ```
-cp path_to_app/configs/domain.com.json path_to_app/configs/eample.com.json
+cp path_to_app/configs/domain.com.json path_to_app/configs/example.com.json
 ```
 
 JSON file
