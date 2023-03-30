@@ -56,7 +56,7 @@ JSON file
     "0.3": [],
     "0.1": ["contact"]
   },
-  "engines_to_pings": [
+  "engines_to_ping": [
     "https://www.google.com/webmasters/sitemaps/ping?sitemap="
   ]
 }
