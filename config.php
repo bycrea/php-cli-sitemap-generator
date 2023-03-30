@@ -47,10 +47,10 @@
     ];
     $custom_priority    = [
         "1.0" => [],
-        "0.8" => ['article', 'recette', 'blog'],
-        "0.5" => ['trouver', 'press'],
+        "0.8" => [],
+        "0.5" => [],
         "0.3" => [],
-        "0.1" => ['contact']
+        "0.1" => []
     ];
     $engines_to_ping   = [
         "https://www.google.com/webmasters/sitemaps/ping?sitemap="
