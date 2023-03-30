@@ -1,6 +1,6 @@
 ## PHP CLI Sitemap Generator (XML)
 
-Use generator.php to generate XML Sitemap from online website
+Use to generate XML Sitemap from online website
 
 
 ### Configuration
