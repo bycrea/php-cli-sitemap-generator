@@ -1,0 +1,16 @@
+{
+  "exportDir": "",
+  "frequency": "",
+  "ssl": true,
+  "startWith": "",
+  "hrefLang": [],
+  "uri_to_bind": [],
+  "extensions_allow": [],
+  "custom_priority": {
+    "1.0": [],
+    "0.8": [],
+    "0.5": [],
+    "0.3": [],
+    "0.1": []
+  }
+}

@@ -1,0 +1,10 @@
+/lib/simplehtmldom-1.9.1/example/
+/lib/simplehtmldom-1.9.1/manual/
+
+/exports/*
+/configs/*
+!/configs/domain.com.json
+
+.idea/
+!*.gitkeep
+*.DS_Store
