@@ -1,27 +1,29 @@
 <?php
 
-    require_once "lib/simplehtmldom-1.9.1/simple_html_dom.php";
-    require_once "lib/curl.php";
-    require_once "config.php";
+    require_once dirname(__DIR__, 1)."/config.php";
+    require_once dirname(__DIR__)."/libs/simplehtmldom-1.9.1/simple_html_dom.php";
+    require_once dirname(__DIR__)."/libs/logs.php";
+    require_once dirname(__DIR__)."/libs/curl.php";
 
 
-    foreach ($websites_to_crawl as $website) {
-        $error_logs = [];
-        $xml = [];
+    foreach ($domains_to_crawl as $domain) {
+        $xml  = [];
 
         // NOTE Get starting uri
-        $slashes = explode("/", $website);
-        $website = array_shift($slashes);
+        $slashes = explode("/", $domain);
+        $domain = array_shift($slashes);
         $startWith = count($slashes) > 0 ? $startWith . implode("/", $slashes) : $startWith;
 
         $uri_to_crawl = [
             $startWith
         ];
 
+
         // NOTE check langHref
-        $response = crawlUrl($website.$startWith, $ssl);
+        $response = crawlUrl($domain.$startWith);
         if ($response->error !== false) {
-            $error_logs[] = sprintf("%s%s : %s", $website, $website.$startWith, $response->error);
+            dispatchLogs(sprintf("%s : %s", $domain.$startWith, "Check StartWith OR SSL configuration"));
+            die;
         } else {
             $html = str_get_html($response->content);
 
@@ -41,9 +43,9 @@
 
 
         // NOTE Get robots.txt
-        $response = crawlUrl($website . "/robots.txt", $ssl);
+        $response = crawlUrl($domain . "/robots.txt");
         if ($response->error !== false) {
-            $error_logs[] = "robots.txt not found";
+            dispatchLogs("robots.txt not found");
         } else {
             preg_match_all("/Disallow:(.+)/", $response->content, $matches, );
             if (isset($matches[1])) foreach ($matches[1] as $match) $uri_to_bind[] = preg_replace(["/\n/", "/\"/", "/\s+/"], "", $match);
@@ -53,17 +55,14 @@
         $i = 0;
         do {
             $uri = $uri_to_crawl[$i];
-            if(in_array($uri, $uri_to_bind) || in_array($uri."*", $uri_to_bind))
-                continue;
 
-            $response = crawlUrl($website.$uri, $ssl);
+            $response = crawlUrl($domain.$uri);
             if ($response->error !== false) {
-                $error_logs[] = sprintf("%s%s : %s", $website, $uri, $response->error);
+                dispatchLogs(sprintf("%s%s : %s", $domain, $uri, $response->error));
             } else {
                 $html = str_get_html($response->content);
                 if(is_bool($html)) {
-                    echo sprintf("%s%s : %s", $website, $uri, 'simplehtmldom error (check memory_limit)');
-                    die;
+                    dispatchLogs(sprintf("%s%s : %s", $domain, $uri, 'Check memory_limit'));
                 }
 
                 $links = [];
@@ -80,11 +79,11 @@
                         case stripos($link, "./") === 0:
                             $link = str_replace("./", $startWith, $link);
                             break;
-                        case stripos($link, "https://".$website.$uri) === 0:
-                            $link = str_replace("https://".$website.$uri, "/", $link);
+                        case stripos($link, "https://".$domain.$uri) === 0:
+                            $link = str_replace("https://".$domain.$uri, "/", $link);
                             break;
-                        case stripos($link, "http://".$website.$uri) === 0:
-                            $link = str_replace("http://".$website.$uri, "/", $link);
+                        case stripos($link, "http://".$domain.$uri) === 0:
+                            $link = str_replace("http://".$domain.$uri, "/", $link);
                             break;
                         case stripos($link, "/") === 0 && (strlen($link) >= strlen($uri) || in_array($link, $hrefLang)):
                             break;
@@ -101,22 +100,25 @@
                     elseif (preg_match("/^.*\.(?!".implode("$|", $extensions_allow)."$)[^.]+$/", $link) == 1)
                         $link = "";
 
-                    // TODO replace !in_array($link, $uri_to_bind) => array_map( 'bindRegex', $uri_to_bind )
-                    // NOTE Add to crawl if not bind and unique
-                    if($link !== "" && !in_array($link, $uri_to_bind) && !in_array($link, $uri_to_crawl)) {
-                        $uri_to_crawl[] = $link;
+                    // NOTE remove bind uri
+                    foreach ($uri_to_bind as $bind) {
+                        if(stripos($bind, "*") !== false)
+                            $regex = "/^".str_replace(["*", "/"], ["", "\/"], $bind).".*/";
+                        else
+                            $regex = "/^".str_replace(["/"], ["\/"], $bind)."$/";
+
+                        if(preg_match($regex, $link, $matches) != 0)
+                            $link = "";
                     }
 
-                    // NOTE store links for this $uri
-                    //  TODO check internal mesh
-                    if($link !== "") $links[] = $link;
+                    // NOTE Add to crawl if not yet added
+                    if($link !== "" && !in_array($link, $uri_to_crawl)) {
+                        $uri_to_crawl[] = $link;
+                    }
                 }
 
                 // NOTE Add to XML
-                $xml[$uri] = [
-                    'links' => $links,
-                    'loc'   => ($ssl ? "https://" : "http://") . $website . $uri
-                ];
+                $xml[$uri] = ['loc' => ($ssl ? "https://" : "http://") . $domain . $uri];
             }
 
             $i++;
@@ -150,9 +152,8 @@
             return (float)$a['priority'] > (float)$b['priority'] ? -1 : 1;
         });
 
-        // NOTE build XML
-        echo "building sitemap ...\n";
 
+        // NOTE build XML
         $lastModif = gmdate("Y-m-d\TH:i:s\Z");
         $URLS = "";
         foreach ($xml as $uri => $values) {
@@ -166,17 +167,21 @@
             ";
         }
 
-        $sitemapXML = file_get_contents(__DIR__ . '/map.xml');
-        $sitemapXML = str_replace("{{website}}", $website, $sitemapXML);
+        $sitemapXML = file_get_contents(dirname(__DIR__, 1).'/map.xml');
+        $sitemapXML = str_replace("{{domain}}", ($ssl ? "https://" : "http://") . $domain, $sitemapXML);
         $sitemapXML = str_replace("{{URLS}}", $URLS, $sitemapXML);
 
-        $website = explode("/", str_replace("www.", "", $website))[0];
-        $dir = "$exportDir/$website";
-        if(!file_exists($dir) || !is_dir($dir)) mkdir($dir);
+        $dir = ($exportDir !== dirname(__DIR__, 1)."/exports") ? $exportDir : "$exportDir/$domain";
+        if(!is_dir($dir)) mkdir($dir);
 
+        dispatchLogs("building: $domain sitemap in $dir");
         $file = fopen("$dir/sitemap.xml", "w");
         fwrite($file, $sitemapXML);
         fclose($file);
+
+
+        // NOTE ping search engines with new sitemap
+        foreach ($engines_to_ping as $url) pingUrl($url . ($ssl ? "https://" : "http://") . $domain . "/sitemap.xml");
     }
 
-    exit("DONE\n");
+    exit("DONE");

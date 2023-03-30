@@ -1,1 +1,1 @@
-<?php require_once "generator.php" ?>
+<?php require_once "libs/generator.php" ?>
