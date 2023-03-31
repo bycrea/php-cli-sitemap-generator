@@ -11,7 +11,7 @@ Change config.php variables
 bool    $echos                  // toggle logs
 array   $domains_to_crawl       // domains to crawl
 string  $exportDir              // where to export sitemap.xml
-string  $frequancy              // hourly|daily|weekly|monthly|yearly|never
+string  $frequency              // hourly|daily|weekly|monthly|yearly|never
 bool    $ssl                    // enable ssl true=https:// | false=http://
 string  $startWith              // can be reset by $hrefLang if link rel=alternate are found
 array   $hrefLang               // hrefLang (also feed with link rel=alternate) ex: ["/en/", "/fr/"]

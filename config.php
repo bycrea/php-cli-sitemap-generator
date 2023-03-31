@@ -22,7 +22,7 @@
      * @var $echos bool                 // toggle logs
      * @var $domains_to_crawl array     // domains to crawl
      * @var $exportDir string           // where to export sitemap.xml
-     * @var $frequancy string           // hourly|daily|weekly|monthly|yearly|never
+     * @var $frequency string           // hourly|daily|weekly|monthly|yearly|never
      * @var $ssl bool                   // enable ssl true=https:// | false=http://
      * @var $startWith string           // can be reset by $hrefLang if link rel=alternate are found
      * @var $hrefLang array             // hrefLang (also feed with link rel=alternate) ex: ["/en/", "/fr/"]

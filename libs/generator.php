@@ -84,7 +84,13 @@
 
                     switch (true) {
                         case stripos($link, "./") === 0:
-                            $link = str_replace("./", $startWith, $link);
+                            if($uri !== $startWith) {
+                                $previous = explode("/", $uri); array_pop($previous);
+                                $previous = implode("/", $previous) . "/";
+                            } else {
+                                $previous = $startWith;
+                            }
+                            $link = str_replace("./", $previous, $link);
                             break;
                         case stripos($link, "https://".$domain.$uri) === 0:
                             $link = str_replace("https://".$domain.$uri, "/", $link);
