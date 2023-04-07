@@ -1,6 +1,8 @@
 <?php
 
+    // NOTE increase memory_limit OR simple_html MAX_FILE_SIZE
     ini_set('memory_limit', '1024M');
+    define('MAX_FILE_SIZE', 10000000);
 
     function dump(...$var)
     {
@@ -19,17 +21,17 @@
 
 
     /*** NOTE Default config
-     * @var $echos bool                 // toggle logs
-     * @var $domains_to_crawl array     // domains to crawl
-     * @var $exportDir string           // where to export sitemap.xml
-     * @var $frequency string           // hourly|daily|weekly|monthly|yearly|never
-     * @var $ssl bool                   // enable ssl true=https:// | false=http://
-     * @var $startWith string           // can be reset by $hrefLang if link rel=alternate are found
-     * @var $hrefLang array             // hrefLang (also feed with link rel=alternate) ex: ["/en/", "/fr/"]
-     * @var $uri_to_bind array          // pages to bind (also feed with robots.txt) regex allow ex: ["/privacy", "/user*"]
-     * @var $extensions_allow array     // use for replacement /index.(ext) => / || add file.(ext) to sitemap
-     * @var $custom_priority array      // custom sitemap priority
-     * @var $engines_to_ping array      // ping new sitemap to search engine (only use when exportDir is the real $domain path)
+     * @var bool $echos                  // toggle logs
+     * @var array $domains_to_crawl      // domains to crawl
+     * @var string $exportDir            // where to export sitemap.xml
+     * @var string $frequency            // hourly|daily|weekly|monthly|yearly|never
+     * @var bool $ssl                    // enable ssl true=https:// | false=http://
+     * @var string $startWith            // can be reset by $hrefLang if link rel=alternate are found
+     * @var array $hrefLang              // hrefLang (also feed with link rel=alternate) ex: ["/en/", "/fr/"]
+     * @var array $uri_to_bind           // pages to bind (also feed with robots.txt) regex allow ex: ["/privacy", "/user*"]
+     * @var array $extensions_allow      // use for replacement /index.(ext) => / || add file.(ext) to sitemap
+     * @var array $custom_priority       // custom sitemap priority
+     * @var array $engines_to_ping       // ping new sitemap to search engine (only use when exportDir is the real $domain path)
      */
 
     $echos = true;

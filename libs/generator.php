@@ -69,7 +69,8 @@
             } else {
                 $html = str_get_html($response->content);
                 if(is_bool($html)) {
-                    dispatchLogs(sprintf("%s%s : %s", $domain, $uri, 'Check memory_limit'));
+                    dispatchLogs(sprintf("%s%s : %s", $domain, $uri, 'Check memory_limit OR simple_html MAX_FILE_SIZE'));
+                    die;
                 }
 
                 $links = [];
@@ -78,6 +79,7 @@
 
                     // NOTE bind nofollow
                     if($a->rel && stripos($a->rel, "nofollow") !== false) continue;
+                    if($a->rel && stripos($a->rel, "noreferer") !== false) continue;
 
                     // NOTE bind anchor
                     if(stripos($link, "#") !== false) $link = explode("#", $link)[0];

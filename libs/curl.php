@@ -36,7 +36,7 @@
 
         curl_close($curl);
 
-        $log .= $error === false ? "Ok." : "KO!";
+        $log .= $error === true ? "KO!" : "Ok.";
         dispatchLogs($log);
 
         return (object) [
@@ -70,11 +70,11 @@
         ]);
 
         curl_exec($curl);
-        $response = curl_errno($curl) === 0 && curl_getinfo($curl, CURLINFO_HTTP_CODE) === 200;
+        $error = curl_errno($curl) !== 0 || curl_getinfo($curl, CURLINFO_HTTP_CODE) !== 200;
         curl_close($curl);
 
-        $log .= $response === true ? "Ok." : "KO!";
+        $log .= $error === true ? "KO!" : "Ok.";
         dispatchLogs($log);
 
-        return $response;
+        return $error;
     }
